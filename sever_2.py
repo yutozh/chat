@@ -163,11 +163,12 @@ class Server(object):
 
                 elif sock == self.server_hole_listen:
                     hole_aim_addr, request_addr = sock.recvfrom(self.RECV_BUF)
-                    hole_aim_addr = tuple(eval(hole_aim_addr))
+                    
                     print hole_aim_addr
                     if hole_aim_addr:
                         if hole_aim_addr == "test":
                             continue
+                        hole_aim_addr = tuple(eval(hole_aim_addr))
                         self.server_hole_sent.sendto("$" + str(request_addr), hole_aim_addr)
 
     def broadcast(self, sock, msg):

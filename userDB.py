@@ -161,13 +161,11 @@ class UserInfoDB(object):
         else:
             return "0"
 
-my_login = UserLoginDB()
+# my_login = UserLoginDB()
 # my_info = UserInfoDB()
 # name = ["小红", "小白", "小黑", "小绿", "小紫"]
-# for i in range(3,25):
-#     uid = "127.0.0." + str(i)
-#     pwd = str(i)*3
+# for i in range(0, 5):
+#     uid = "121314" + str(i)
+#     pwd = str(i)*6
 #     my_login.add(uid, pwd)
-#     my_info.add(uid, name[i % 5] + name[i % 4])
-
-# print my_login.search("127.0.0.3", 333)
+#     my_info.add(uid, name[i])

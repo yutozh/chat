@@ -204,7 +204,7 @@ class ClientConn(object):
     send_socket_default = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def __init__(self, id, token, master):
-        self.local_ip = id
+        self.local_ip = "192.168.0.103"
         self.server_host = serverip
         self.server_port = 8008
         self.listen_port = 2333
@@ -318,11 +318,14 @@ class loginGUI(object):
         self.bt_login.grid(row=2, column=0, columnspan=2, padx=60)
         self.l_alert.grid(row=3, column=0, columnspan=2)
 
+        self.localip = "192.168.0.103"
         self.token = ""
         self.server_host = serverip
         self.server_port = 8888
         self.BUF = 4096
         self.login.mainloop()
+
+
 
     def tologin(self):
         id = self.en_id.get()
@@ -330,13 +333,15 @@ class loginGUI(object):
 
         login_dict = {"uid": id, "pwd": pwd}
         conn_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        conn_socket.bind((id, 1234))
+        conn_socket.bind((self.localip, 1234))
         try:
+            print (self.server_host, self.server_port)
             conn_socket.connect((self.server_host, self.server_port))
         except socket.error, e:
             print e
             self.l_alert["text"] = "连接服务器出错"
             conn_socket.close()
+            exit(1)
 
         conn_socket.send(json.dumps(login_dict))
         res = conn_socket.recv(self.BUF)

@@ -27,7 +27,8 @@ class Server(object):
         self.server_hole_listen = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.server_hole_sent = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-        self.host = socket.gethostname()   # 获得主机名，zyt-K52Jc
+        # self.host = socket.gethostname()   # 获得主机名，zyt-K52Jc
+        self.host = self.ip
         self.BACKLOG = 10  # 最大Listen连接数
         self.RECV_BUF = 4096  # 单次发送数据量
         self.socketlist = []  # 列表，包括了监听socket和各客户端连接的socket
@@ -66,6 +67,8 @@ class Server(object):
         self.server_hole_listen.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         self.server_hole_listen.bind((self.host, self.hole_listen_port))
 
+        self.server_default_sent_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.server_default_sent_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         self.server_default_sent_socket.bind((self.host, self.default_send_port))
 
         self.server_hole_sent.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

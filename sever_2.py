@@ -38,19 +38,7 @@ class Server(object):
         self.alluser = {}
 
         self.defaultlist = {}
-        self.t = Thread(target=self.updateuser, args=())
-        self.t.start()
 
-        signal.signal(signal.SIGTERM, self.sig_exit)
-        signal.signal(signal.SIGINT, self.sig_exit)
-
-    def updateuser(self):
-        while True:
-            my_info_db = userDB.UserInfoDB()
-            self.alluser = my_info_db.searchAll()
-            time.sleep(5)
-
-    def start(self):
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)  # 重用端口，不会出现Address used
         self.server_socket.bind((self.host, self.port))  # 绑定到指定端口
@@ -81,6 +69,26 @@ class Server(object):
         self.socketlist.append(self.server_login_socket)
         self.socketlist.append(self.server_default_socket)
         self.socketlist.append(self.server_hole_listen)
+
+        signal.signal(signal.SIGTERM, self.sig_exit)
+        signal.signal(signal.SIGINT, self.sig_exit)
+
+        self.t1 = Thread(target=self.updateuser, args=())
+        self.t2 = Thread(target=self.testonline, args=())
+        self.t1.start()
+        self.t2.start()
+        
+    def updateuser(self):
+        while True:
+            my_info_db = userDB.UserInfoDB()
+            self.alluser = my_info_db.searchAll()
+            time.sleep(5)
+
+    def testonline(self):
+        while True:
+            self.broadcast(self.server_socket, "test")
+            time.sleep(15)
+    def start(self):
 
         print "Server start at : " + self.host + ":" + str(self.port)
 

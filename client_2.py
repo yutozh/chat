@@ -214,10 +214,11 @@ class ClientConn(object):
         self.token = token
 
         self.client_socket = socket.socket()
-        self.client_socket.bind((self.local_ip, 6666))
-        self.client_socket.settimeout(5)
         self.client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        self.client_socket.bind((self.local_ip, 6666))
+        self.client_socket.settimeout(5)
+
 
         self.socketlist = []
 
@@ -277,6 +278,8 @@ class ClientConn(object):
                         data = sock.recv(self.BUF)
                         if not data:
                             res = (-2, "Disconnect with server!!!")
+                        elif data == "test":
+                            continue
                         else:
                             res = (0, data)
                     except socket.error:
@@ -334,6 +337,7 @@ class loginGUI(object):
         login_dict = {"uid": id, "pwd": pwd}
         conn_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         conn_socket.bind((self.localip, 1234))
+        conn_socket.settimeout(1)
         try:
             print (self.server_host, self.server_port)
             conn_socket.connect((self.server_host, self.server_port))

@@ -123,12 +123,13 @@ class Server(object):
                 elif sock == self.server_login_socket:
                     client_login_socket, client_login_addr = sock.accept()
                     login = client_login_socket.recv(self.RECV_BUF)
-                    login = json.loads(login)
                     try:
+                        login = json.loads(login)
                         user_id = login["uid"]
                         user_pwd = login["pwd"]
-                    except KeyError:
+                    except Exception, e:
                         print "login key error"
+                        continue
                     my_login_db = userDB.UserLoginDB()
                     res = my_login_db.search(user_id, user_pwd)
                     if res == "1":         # 0000000000000000000000
@@ -163,7 +164,7 @@ class Server(object):
 
                 elif sock == self.server_hole_listen:
                     hole_aim_addr, request_addr = sock.recvfrom(self.RECV_BUF)
-                    
+
                     print hole_aim_addr
                     if hole_aim_addr:
                         if hole_aim_addr == "test":

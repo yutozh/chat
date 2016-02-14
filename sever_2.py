@@ -12,7 +12,7 @@ from threading import *
 
 class Server(object):
     def __init__(self):
-        self.ip = "182.254.146.38"
+        self.ip = "10.105.3.129"
 
         self.port = 8008
         self.loginport = 8888

@@ -56,21 +56,21 @@ class Server(object):
 
         self.server_login_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_login_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        self.server_login_socket.bind((self.ip, self.loginport))
+        self.server_login_socket.bind((self.host, self.loginport))
 
         self.server_default_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_default_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        self.server_default_socket.bind((self.ip, self.default_listen_port))
+        self.server_default_socket.bind((self.host, self.default_listen_port))
 
         self.server_hole_listen.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_hole_listen.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        self.server_hole_listen.bind((self.ip, self.hole_listen_port))
+        self.server_hole_listen.bind((self.host, self.hole_listen_port))
 
-        self.server_default_sent_socket.bind((self.ip, self.default_send_port))
+        self.server_default_sent_socket.bind((self.host, self.default_send_port))
 
         self.server_hole_sent.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_hole_sent.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        self.server_hole_sent.bind((self.ip, self.hole_sent_port))
+        self.server_hole_sent.bind((self.host, self.hole_sent_port))
 
         self.server_socket.listen(self.BACKLOG)  # 开始监听
         self.server_login_socket.listen(self.BACKLOG)

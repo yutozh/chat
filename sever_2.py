@@ -226,7 +226,7 @@ class Server(object):
         for each_sock in self.socketlist:
             if each_sock != self.server_socket and each_sock != self.server_login_socket and \
                     each_sock != self.server_default_socket and each_sock != self.server_hole_listen\
-                    and sock != self.test and sock != each_sock:
+                    and each_sock != self.test and sock != each_sock:
                 try:
                     each_sock.send(msg)
                 except socket.error:

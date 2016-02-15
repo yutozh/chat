@@ -174,7 +174,7 @@ class Server(object):
 
                     print hole_aim_addr
                     if hole_aim_addr:
-                        if hole_aim_addr.startwith("u"):
+                        if hole_aim_addr.startswith("u"):
                             init_id = hole_aim_addr[1:]
 
                             # 此时client_login_addr为客户端的外网ip+port

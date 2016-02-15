@@ -14,6 +14,8 @@ except Exception, e:
     sys.exit(1)
 
 test = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+test.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+test.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
 try:
     test.bind(("10.105.3.129", 8866))
     data = {"id": "1213141", "msg": "hahaha"}

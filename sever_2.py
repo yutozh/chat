@@ -177,7 +177,8 @@ class Server(object):
                         if hole_aim_addr.startswith("u"):
                             init_id = hole_aim_addr[1:]
 
-                            # 此时client_login_addr为客户端的外网ip+port
+                            # 此时request_addr为客户端的外网ip+port
+                            # 将此ip返回给客户端作为打洞地址，可实现打洞
                             self.onlineuserdict[init_id] = request_addr
                             continue
                         hole_aim_addr = tuple(eval(hole_aim_addr))

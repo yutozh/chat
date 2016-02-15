@@ -1,5 +1,6 @@
 # encoding=utf-8
 import socket
+import json
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -14,7 +15,9 @@ except Exception, e:
 
 test = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 try:
-    test.sendto("testhhhh", (ip, port))
+    data = {"id": "1213141", "msg": "hahaha"}
+    data = json.dumps(data)
+    test.sendto(data, (ip, port))
 except socket.error, e:
     print e
 

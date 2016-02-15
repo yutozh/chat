@@ -181,7 +181,7 @@ class Server(object):
                 elif sock == self.server_hole_listen:
                     hole_aim_addr, request_addr = sock.recvfrom(self.RECV_BUF)
 
-                    print hole_aim_addr
+                    print hole_aim_addr, request_addr
                     try:
                         if hole_aim_addr:
                             if hole_aim_addr.startswith("u"):

@@ -27,6 +27,7 @@ class Server(object):
         self.server_hole_listen = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.server_hole_sent = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
+        self.test = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # self.host = socket.gethostname()   # 获得主机名，zyt-K52Jc
         self.host = self.ip
         self.BACKLOG = 10  # 最大Listen连接数
@@ -51,9 +52,14 @@ class Server(object):
         self.server_default_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         self.server_default_socket.bind((self.host, self.default_listen_port))
 
+        #
         self.server_hole_listen.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_hole_listen.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         self.server_hole_listen.bind((self.host, self.hole_listen_port))
+        #
+        self.test.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.test.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        self.test.bind((self.host, 8668))
 
         self.server_default_sent_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_default_sent_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
@@ -70,6 +76,8 @@ class Server(object):
         self.socketlist.append(self.server_default_socket)
         self.socketlist.append(self.server_hole_listen)
 
+        #
+        self.socketlist.append(self.test)
         signal.signal(signal.SIGTERM, self.sig_exit)
         signal.signal(signal.SIGINT, self.sig_exit)
 
@@ -196,6 +204,9 @@ class Server(object):
                     except Exception, e:
                         print "hole_listen error", e
                         continue
+                elif sock == self.test:
+                    hole_aim_addr, request_addr = sock.recvfrom(self.RECV_BUF)
+                    print hole_aim_addr, request_addr
 
     def sendstatus(self):
         for i in self.alluser:
@@ -213,7 +224,7 @@ class Server(object):
         for each_sock in self.socketlist:
             if each_sock != self.server_socket and each_sock != self.server_login_socket and \
                     each_sock != self.server_default_socket and each_sock != self.server_hole_listen\
-                    and sock != each_sock:
+                    and sock != self.test and sock != each_sock:
                 try:
                     each_sock.send(msg)
                 except socket.error:

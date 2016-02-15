@@ -192,6 +192,7 @@ class chatGUI(object):
         try:
             ClientConn.send_socket.sendto("hello", tuple(self.peeraddr))
             ClientConn.send_socket.sendto(str(self.peeraddr), (serverip, 8866))
+            ClientConn.send_socket.sendto(str(self.peeraddr), (serverip, 8866))
             print "ok"
         except socket.error, e:
             print "Hole error", e

@@ -204,9 +204,11 @@ class Server(object):
                     except Exception, e:
                         print "hole_listen error", e
                         continue
+
                 elif sock == self.test:
-                    hole_aim_addr, request_addr = sock.recvfrom(self.RECV_BUF)
-                    print hole_aim_addr, request_addr
+                    print "ok"
+                    a, b = sock.recvfrom(self.RECV_BUF)
+                    print a, b
 
     def sendstatus(self):
         for i in self.alluser:
@@ -229,6 +231,7 @@ class Server(object):
                     each_sock.send(msg)
                 except socket.error:
                     self.socketlist.remove(each_sock)
+                    print "有用户退出了"
                     each_sock.close()
                     continue
 

@@ -4,7 +4,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-
+# 从服务器上主动发送消息给客户来测试
 try:
     ip = str(sys.argv[1])
     port = int(sys.argv[2])

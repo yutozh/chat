@@ -139,8 +139,8 @@ class Server(object):
 
                 elif sock == self.server_login_socket:
                     client_login_socket, client_login_addr = sock.accept()
-                    login = client_login_socket.recv(self.RECV_BUF)
                     try:
+                        login = client_login_socket.recv(self.RECV_BUF)
                         login = json.loads(login)
                         user_id = login["uid"]
                         user_pwd = login["pwd"]

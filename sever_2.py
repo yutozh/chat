@@ -100,9 +100,14 @@ class Server(object):
                 if sock == self.server_socket:
                     client_socket, client_addr = sock.accept()  # 获得请求的客户端信息
 
-                    # 验证登录
-                    login_token = client_socket.recv(self.RECV_BUF)
-                    uid = login_token.split("|")[1]
+                    try:
+                        # 验证登录
+                        login_token = client_socket.recv(self.RECV_BUF)
+                        uid = login_token.split("|")[1]
+                    except Exception, e:
+                        print "token error", e
+                        continue
+
                     if login_token != self.tokendict[uid]:
                         client_socket.close()
                         continue
@@ -131,6 +136,7 @@ class Server(object):
                                 data = json.dumps(data)
                                 self.server_default_sent_socket.sendto(data, (client_addr[0], 2333))
                         self.defaultlist[uid] = {}
+
                 elif sock == self.server_login_socket:
                     client_login_socket, client_login_addr = sock.accept()
                     login = client_login_socket.recv(self.RECV_BUF)
@@ -159,10 +165,13 @@ class Server(object):
 
                 elif sock == self.server_default_socket:
                     data, peer_addr = sock.recvfrom(self.RECV_BUF)
-                    data = json.loads(data)
-                    from_id = data["id"].split("|")[0]
-                    aim_id = data["id"].split("|")[1]  # 离线消息目标用户id
-
+                    try:
+                        data = json.loads(data)
+                        from_id = data["id"].split("|")[0]
+                        aim_id = data["id"].split("|")[1]  # 离线消息目标用户id
+                    except Exception, e:
+                        print "default_socket error", e
+                        continue
                     if aim_id not in self.defaultlist.keys():
                         self.defaultlist[aim_id] = {}
                     if len(self.defaultlist[aim_id]) == 0:
@@ -173,16 +182,20 @@ class Server(object):
                     hole_aim_addr, request_addr = sock.recvfrom(self.RECV_BUF)
 
                     print hole_aim_addr
-                    if hole_aim_addr:
-                        if hole_aim_addr.startswith("u"):
-                            init_id = hole_aim_addr[1:]
+                    try:
+                        if hole_aim_addr:
+                            if hole_aim_addr.startswith("u"):
+                                init_id = hole_aim_addr[1:]
 
-                            # 此时request_addr为客户端的外网ip+port
-                            # 将此ip返回给客户端作为打洞地址，可实现打洞
-                            self.onlineuserdict[init_id] = request_addr
-                            continue
-                        hole_aim_addr = tuple(eval(hole_aim_addr))
-                        self.server_hole_sent.sendto("$" + str(request_addr), hole_aim_addr)
+                                # 此时request_addr为客户端的外网ip+port
+                                # 将此ip返回给客户端作为打洞地址，可实现打洞
+                                self.onlineuserdict[init_id] = request_addr
+                                continue
+                            hole_aim_addr = tuple(eval(hole_aim_addr))
+                            self.server_hole_sent.sendto("$" + str(request_addr), hole_aim_addr)
+                    except Exception, e:
+                        print "hole_listen error", e
+                        continue
 
     def sendstatus(self):
         for i in self.alluser:

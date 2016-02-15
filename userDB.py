@@ -1,12 +1,13 @@
 # coding=utf-8
 import MySQLdb
 import sys
+from config import *
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
 
 def getConn():
-    conn = MySQLdb.connect(host="localhost", user="root", passwd="zsqcse", port=3306, charset='utf8', db="chat")
+    conn = MySQLdb.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWORD, port=DB_PORT, charset='utf8', db="chat")
     return conn
 
 

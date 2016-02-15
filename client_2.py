@@ -290,6 +290,7 @@ class ClientConn(object):
 
                 elif sock == self.client_listen_socket:
                     data, peer_addr = sock.recvfrom(self.BUF)
+                    print "ooooooo"
                     if not data:
                         sock.close()
                         continue

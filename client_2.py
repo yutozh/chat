@@ -11,6 +11,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 serverip = "182.254.146.38"
+localip = "192.168.0.103"
 
 
 class ClientGUI(object):
@@ -185,6 +186,7 @@ class chatGUI(object):
                 pass
 
     def digHole(self):
+        # 用户不在线，无需打洞
         if self.peeraddr == "x":
             return True
         try:
@@ -197,6 +199,7 @@ class chatGUI(object):
         # 打洞完成
         return True
 
+
 class ClientConn(object):
     # 使用统一的后台发送数据端口
     send_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -204,7 +207,7 @@ class ClientConn(object):
     send_socket_default = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def __init__(self, id, token, master):
-        self.local_ip = "192.168.0.103"
+        self.local_ip = localip
         self.server_host = serverip
         self.server_port = 8008
         self.listen_port = 2333
@@ -218,7 +221,6 @@ class ClientConn(object):
         self.client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         self.client_socket.bind((self.local_ip, 6666))
         self.client_socket.settimeout(5)
-
 
         self.socketlist = []
 
@@ -236,7 +238,8 @@ class ClientConn(object):
         # ====================
         ClientConn.send_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         ClientConn.send_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        ClientConn.send_socket.bind((self.local_ip, 2333))
+        ClientConn.send_socket.bind((self.local_ip, self.listen_port))  # 发送端口与接受消息端口相同
+
         ClientConn.send_socket_default.bind((self.local_ip, 6888))
 
         self.master = master  # 主界面
@@ -245,7 +248,7 @@ class ClientConn(object):
         self.running = True
 
         # 新线程，跑后台程序，通过消息队列返回结果
-        self.thread1 = threading.Thread(target=self.clientStart, args=(self.local_ip,))
+        self.thread1 = threading.Thread(target=self.clientStart, args=(id,))
         self.thread1.start()
 
         # 周期循环调用控制函数
@@ -260,12 +263,12 @@ class ClientConn(object):
             self.master.destroy()
 
     # 后台实现函数，两个socket,一个与服务器保持链接(TCP)，另一个监听接受消息端口（UDP）
-    def clientStart(self, ip):
+    def clientStart(self, id):
         try:
             self.client_socket.connect((self.server_host, self.server_port))
             self.client_socket.send(self.token)
-            # ====================================
-            ClientConn.send_socket.sendto("test", (self.server_host, self.hole_port))
+            # 上线后，通知打洞请求端口，自爆家门（ip+port）
+            ClientConn.send_socket.sendto("u"+str(id), (self.server_host, self.hole_port))
         except socket.error:
             return -1, "Cann't connect!!!"
 
@@ -321,14 +324,12 @@ class loginGUI(object):
         self.bt_login.grid(row=2, column=0, columnspan=2, padx=60)
         self.l_alert.grid(row=3, column=0, columnspan=2)
 
-        self.localip = "192.168.0.103"
+        self.localip = localip
         self.token = ""
         self.server_host = serverip
         self.server_port = 8888
         self.BUF = 4096
         self.login.mainloop()
-
-
 
     def tologin(self):
         id = self.en_id.get()

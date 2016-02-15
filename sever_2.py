@@ -77,7 +77,7 @@ class Server(object):
         self.t2 = Thread(target=self.testonline, args=())
         self.t1.start()
         self.t2.start()
-        
+
     def updateuser(self):
         while True:
             my_info_db = userDB.UserInfoDB()
@@ -86,8 +86,10 @@ class Server(object):
 
     def testonline(self):
         while True:
-            self.broadcast(self.server_socket, "test")
+            # self.broadcast(self.server_socket, "test")
+            self.sendstatus()
             time.sleep(15)
+
     def start(self):
 
         print "Server start at : " + self.host + ":" + str(self.port)
@@ -110,16 +112,17 @@ class Server(object):
 
                     print "Client: [%s:%s] is connected!\n" % client_addr
 
-                    for i in self.alluser:
-                        self.userdict[i[1]] = {}
-                        if i[1] in self.onlineuserdict.keys():   # i[1]是ID号
-                            self.userdict[i[1]]["ip"] = self.onlineuserdict[i[1]]
-                        else:
-                            self.userdict[i[1]]["ip"] = "x"
-                        self.userdict[i[1]]["name"] = i[2]
-
-                    back_info = json.dumps(self.userdict)
-                    self.broadcast(sock, back_info)
+                    # for i in self.alluser:
+                    #     self.userdict[i[1]] = {}
+                    #     if i[1] in self.onlineuserdict.keys():   # i[1]是ID号
+                    #         self.userdict[i[1]]["ip"] = self.onlineuserdict[i[1]]
+                    #     else:
+                    #         self.userdict[i[1]]["ip"] = "x"
+                    #     self.userdict[i[1]]["name"] = i[2]
+                    #
+                    # back_info = json.dumps(self.userdict)
+                    # self.broadcast(sock, back_info)
+                    self.sendstatus()
 
                     if uid in self.defaultlist.keys():
                         for id, connent in self.defaultlist[uid].items():
@@ -143,13 +146,9 @@ class Server(object):
                     if res == "1":         # 0000000000000000000000
                         # 加密获得token
                         sha = hashlib.sha1()
-                        sha.update(str(time.time())+ str(user_id))
+                        sha.update(str(time.time()) + str(user_id))
                         token = sha.hexdigest() + "|" + str(user_id)
                         self.tokendict[user_id] = token
-
-                        # 此时client_login_addr为客户端的外网ip+port
-                        # ========================================
-                        self.onlineuserdict[user_id] = client_login_addr
 
                         client_login_socket.send(token)
                         client_login_socket.close()
@@ -175,10 +174,26 @@ class Server(object):
 
                     print hole_aim_addr
                     if hole_aim_addr:
-                        if hole_aim_addr == "test":
+                        if hole_aim_addr.startwith("u"):
+                            init_id = hole_aim_addr[1:]
+
+                            # 此时client_login_addr为客户端的外网ip+port
+                            self.onlineuserdict[init_id] = request_addr
                             continue
                         hole_aim_addr = tuple(eval(hole_aim_addr))
                         self.server_hole_sent.sendto("$" + str(request_addr), hole_aim_addr)
+
+    def sendstatus(self):
+        for i in self.alluser:
+            self.userdict[i[1]] = {}
+            if i[1] in self.onlineuserdict.keys():   # i[1]是ID号
+                self.userdict[i[1]]["ip"] = self.onlineuserdict[i[1]]
+            else:
+                self.userdict[i[1]]["ip"] = "x"
+            self.userdict[i[1]]["name"] = i[2]
+
+        back_info = json.dumps(self.userdict)
+        self.broadcast(self.server_socket, back_info)
 
     def broadcast(self, sock, msg):
         for each_sock in self.socketlist:
@@ -188,8 +203,8 @@ class Server(object):
                 try:
                     each_sock.send(msg)
                 except socket.error:
-                    each_sock.close()
                     self.socketlist.remove(each_sock)
+                    each_sock.close()
                     continue
 
     def sig_exit(self, a, b):

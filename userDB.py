@@ -100,7 +100,7 @@ class UserInfoDB(object):
         except Exception, e:  # 用户名重复的异常
             print "User already exists!!!", e
         conn.commit()
-        cur.close()
+        cur.closae()
         conn.close()
 
     def delete(self, uid):

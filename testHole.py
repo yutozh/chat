@@ -15,6 +15,7 @@ except Exception, e:
 
 test = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 try:
+    test.bind(("10.105.3.129", 8866))
     data = {"id": "1213141", "msg": "hahaha"}
     data = json.dumps(data)
     test.sendto(data, (ip, port))

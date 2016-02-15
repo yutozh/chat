@@ -192,8 +192,9 @@ class Server(object):
                                 self.onlineuserdict[init_id] = request_addr
                                 continue
                             hole_aim_addr = tuple(eval(hole_aim_addr))
-                            print "sss", hole_aim_addr
+
                             self.server_hole_sent.sendto("$" + str(request_addr), hole_aim_addr)
+                            print "sss", hole_aim_addr
                     except Exception, e:
                         print "hole_listen error", e
                         continue

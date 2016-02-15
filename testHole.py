@@ -24,5 +24,4 @@ try:
 except socket.error, e:
     print e
 
-test.close()
 

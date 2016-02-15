@@ -14,7 +14,7 @@ except Exception, e:
 
 test = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 try:
-    test.sendto("test", (ip, port))
+    test.sendto("testhhhh", (ip, port))
 except socket.error, e:
     print e
 

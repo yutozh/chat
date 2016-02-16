@@ -19,7 +19,7 @@ class Server(object):
         self.default_listen_port = 8666
         self.default_send_port = 8686
         self.hole_listen_port = 8866  # 监听打洞请求的端口
-        self.hole_sent_port = 6688     # 打洞请求发送端口
+        self.hole_sent_port = 8866     # 打洞请求发送端口
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_login_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_default_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

@@ -192,7 +192,7 @@ class chatGUI(object):
         try:
             ClientConn.send_socket.sendto("hello", tuple(self.peeraddr))
             ClientConn.send_socket.sendto(str(self.peeraddr), (serverip, 8866))
-            print "ok"
+            print tuple(self.peeraddr), "ok"
         except socket.error, e:
             print "Hole error", e
             return False
@@ -277,6 +277,7 @@ class ClientConn(object):
             res = ""
             for sock in read_sockets:
                 if sock == self.client_socket:
+                    print "client_reveived"
                     try:
                         data = sock.recv(self.BUF)
                         if not data:
@@ -289,8 +290,9 @@ class ClientConn(object):
                         res = (-3, "Disconnect with server!!!")
 
                 elif sock == self.client_listen_socket:
-                    data, peer_addr = sock.recvfrom(self.BUF)
                     print "ooooooo"
+                    data, peer_addr = sock.recvfrom(self.BUF)
+
                     if not data:
                         sock.close()
                         continue

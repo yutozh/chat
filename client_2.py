@@ -338,7 +338,6 @@ class ClientConn(object):
             if data == "hello":
                 continue
             if data.startswith("$"):
-                print "$$$$$$$$"
                 hole_aim_addr = data[1:]
                 hole_aim_addr = tuple(eval(hole_aim_addr))
                 ClientConn.send_socket.sendto("hello", hole_aim_addr)

@@ -51,6 +51,10 @@ class Server(object):
         self.server_default_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         self.server_default_socket.bind((self.host, self.default_listen_port))
 
+        self.server_hole_sent.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.server_hole_sent.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        self.server_hole_sent.bind((self.host, self.hole_sent_port))
+
         self.server_hole_listen.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_hole_listen.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         self.server_hole_listen.bind((self.host, self.hole_listen_port))
@@ -58,10 +62,6 @@ class Server(object):
         self.server_default_sent_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_default_sent_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         self.server_default_sent_socket.bind((self.host, self.default_send_port))
-
-        self.server_hole_sent.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.server_hole_sent.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        self.server_hole_sent.bind((self.host, self.hole_sent_port))
 
         self.server_socket.listen(self.BACKLOG)  # 开始监听
         self.server_login_socket.listen(self.BACKLOG)
@@ -205,12 +205,13 @@ class Server(object):
 
     def sendstatus(self):
         for i in self.alluser:
-            self.userdict[i[1]] = {}
+            uid = str(i[1])
+            self.userdict[uid] = {}
             if i[1] in self.onlineuserdict.keys():   # i[1]是ID号
-                self.userdict[i[1]]["ip"] = self.onlineuserdict[i[1]]
+                self.userdict[uid]["ip"] = self.onlineuserdict[uid]
             else:
-                self.userdict[i[1]]["ip"] = "x"
-            self.userdict[i[1]]["name"] = i[2]
+                self.userdict[uid]["ip"] = "x"
+            self.userdict[uid]["name"] = i[2]
 
         back_info = json.dumps(self.userdict)
         self.broadcast(self.server_socket, back_info)

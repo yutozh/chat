@@ -188,6 +188,7 @@ class chatGUI(object):
     def digHole(self):
         # 用户不在线，无需打洞
         if self.peeraddr == "x":
+            print "True x"
             return True
         try:
             ClientConn.send_socket.sendto("hello", tuple(self.peeraddr))

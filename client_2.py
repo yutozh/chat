@@ -242,9 +242,6 @@ class ClientConn(object):
 
         self.socketlist.append(self.client_listen_socket)
 
-
-
-
         ClientConn.send_socket_default.bind((self.local_ip, 6888))
 
         self.master = master  # 主界面

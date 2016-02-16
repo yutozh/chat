@@ -197,6 +197,7 @@ class Server(object):
                                 continue
 
                             init_id = hole_aim_addr.split("|")[0]
+                            print init_id
                             self.onlineuserdict[init_id] = request_addr
                             hole_aim_addr = tuple(eval(hole_aim_addr))
 

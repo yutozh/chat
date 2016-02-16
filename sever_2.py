@@ -195,6 +195,9 @@ class Server(object):
                                 # 将此ip返回给客户端作为打洞地址，可实现打洞
                                 self.onlineuserdict[init_id] = request_addr
                                 continue
+
+                            init_id = hole_aim_addr.split("|")[0]
+                            self.onlineuserdict[init_id] = request_addr
                             hole_aim_addr = tuple(eval(hole_aim_addr))
 
                             self.server_hole_sent.sendto("$" + str(request_addr), hole_aim_addr)

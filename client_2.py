@@ -192,7 +192,7 @@ class chatGUI(object):
             return True
         try:
             ClientConn.send_socket.sendto("hello", tuple(self.peeraddr))
-            ClientConn.send_socket.sendto(str(self.peeraddr), (serverip, 8866))
+            ClientConn.send_socket.sendto(ClientGUI.myid + "|" + str(self.peeraddr), (serverip, 8866))
             print tuple(self.peeraddr), "ok"
         except socket.error, e:
             print "Hole error", e
@@ -231,13 +231,13 @@ class ClientConn(object):
 
         # 用来发送的socket绑定
         # ====================
-        ClientConn.send_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         ClientConn.send_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # ClientConn.send_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         ClientConn.send_socket.bind((self.local_ip, self.listen_port))  # 发送端口与接受消息端口相同
 
         self.client_listen_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.client_listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.client_listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        # self.client_listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         self.client_listen_socket.bind((self.local_ip, self.listen_port))
 
         self.socketlist.append(self.client_listen_socket)
@@ -274,43 +274,78 @@ class ClientConn(object):
         except socket.error:
             return -1, "Cann't connect!!!"
 
-        while self.running:
-            read_sockets, write_sockets, error_sockets = select.select(self.socketlist, [], [])
-            res = ""
-            for sock in read_sockets:
-                print "....."
-                if sock == self.client_socket:
-                    print "client_reveived"
-                    try:
-                        data = sock.recv(self.BUF)
-                        if not data:
-                            res = (-2, "Disconnect with server!!!")
-                        elif data == "test":
-                            continue
-                        else:
-                            res = (0, data)
-                    except socket.error:
-                        res = (-3, "Disconnect with server!!!")
-                    print "11111"
+        t_1 = threading.Thread(target=self.cs, args=(self.client_socket, ))
+        t_1.start()
+        t_2 = threading.Thread(target=self.cl, args=(self.client_listen_socket, ))
+        t_2.start()
+        # while self.running:
+        #
+        #     read_sockets, write_sockets, error_sockets = select.select(self.socketlist, [], [])
+        #     res = ""
+        #     for sock in read_sockets:
+        #         if sock == self.client_socket:
+        #             try:
+        #                 data = sock.recv(self.BUF)
+        #                 if not data:
+        #                     res = (-2, "Disconnect with server!!!")
+        #                 elif data == "test":
+        #                     continue
+        #                 else:
+        #                     res = (0, data)
+        #             except socket.error:
+        #                 res = (-3, "Disconnect with server!!!")
+        #         elif sock == self.client_listen_socket:
+        #             print "ooooooo"
+        #             data, peer_addr = sock.recvfrom(self.BUF)
+        #             print data
+        #             if not data:
+        #                 sock.close()
+        #                 continue
+        #             if data == "hello":
+        #                 continue
+        #             if data.startswith("$"):
+        #                 print "$$$$$$$$"
+        #                 hole_aim_addr = data[1:]
+        #                 hole_aim_addr = tuple(eval(hole_aim_addr))
+        #                 ClientConn.send_socket.sendto("hello", hole_aim_addr)
+        #                 continue
+        #             data = json.loads(data)   # 解析含有id的data
+        #             res = (1, peer_addr[0], data)
+        #         self.queue.put(res)
 
-                elif sock == self.client_listen_socket:
-                    print "ooooooo"
-                    data, peer_addr = sock.recvfrom(self.BUF)
-                    print data
-                    if not data:
-                        sock.close()
-                        continue
-                    if data == "hello":
-                        continue
-                    if data.startswith("$"):
-                        print "$$$$$$$$"
-                        hole_aim_addr = data[1:]
-                        hole_aim_addr = tuple(eval(hole_aim_addr))
-                        ClientConn.send_socket.sendto("hello", hole_aim_addr)
-                        continue
-                    data = json.loads(data)   # 解析含有id的data
-                    res = (1, peer_addr[0], data)
-                self.queue.put(res)
+    def cs(self, sock):
+        while True:
+            try:
+                data = sock.recv(self.BUF)
+                if not data:
+                    res = (-2, "Disconnect with server!!!")
+                elif data == "test":
+                    continue
+                else:
+                    res = (0, data)
+            except socket.error:
+                res = (-3, "Disconnect with server!!!")
+            self.queue.put(res)
+
+    def cl(self, sock):
+        while True:
+            print "ooooooo"
+            data, peer_addr = sock.recvfrom(self.BUF)
+            print data
+            if not data:
+                sock.close()
+                continue
+            if data == "hello":
+                continue
+            if data.startswith("$"):
+                print "$$$$$$$$"
+                hole_aim_addr = data[1:]
+                hole_aim_addr = tuple(eval(hole_aim_addr))
+                ClientConn.send_socket.sendto("hello", hole_aim_addr)
+                continue
+            data = json.loads(data)   # 解析含有id的data
+            res = (1, peer_addr[0], data)
+            self.queue.put(res)
 
 
 class loginGUI(object):

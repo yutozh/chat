@@ -198,7 +198,7 @@ class Server(object):
 
                             init_id = hole_aim_addr.split("|")[0]
                             self.onlineuserdict[str(init_id)] = request_addr
-                            hole_aim_addr = tuple(eval(hole_aim_addr))
+                            hole_aim_addr = tuple(eval(hole_aim_addr.split("|")[1]))
 
                             self.server_hole_sent.sendto("$" + str(request_addr), hole_aim_addr)
                             print "sss", hole_aim_addr

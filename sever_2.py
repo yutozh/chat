@@ -103,6 +103,7 @@ class Server(object):
                     try:
                         # 验证登录
                         login_token = client_socket.recv(self.RECV_BUF)
+                        print login_token
                         uid = login_token.split("|")[1]
                     except Exception, e:
                         print "token error", e
@@ -156,7 +157,6 @@ class Server(object):
                         token = sha.hexdigest() + "|" + str(user_id)
                         self.tokendict[user_id] = token
 
-                        print user_id
                         client_login_socket.send(token)
                         client_login_socket.close()
                     else:

@@ -107,12 +107,12 @@ class Server(object):
                         for i in self.tokendict.keys():
                             print i
                         uid = login_token.split("|")[1]
+
+                        if login_token != self.tokendict[str(uid)]:
+                            client_socket.close()
+                            continue
                     except Exception, e:
                         print "token error", e
-                        continue
-
-                    if login_token != self.tokendict[str(uid)]:
-                        client_socket.close()
                         continue
 
                     # 成功则保留socket

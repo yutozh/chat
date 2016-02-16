@@ -111,7 +111,7 @@ class Server(object):
                         print "token error", e
                         continue
 
-                    if login_token != self.tokendict[uid]:
+                    if login_token != self.tokendict[str(uid)]:
                         client_socket.close()
                         continue
 
@@ -157,9 +157,8 @@ class Server(object):
                         sha = hashlib.sha1()
                         sha.update(str(time.time()) + str(user_id))
                         token = sha.hexdigest() + "|" + str(user_id)
-                        self.tokendict[user_id] = token
+                        self.tokendict[str(user_id)] = token
 
-                        time.sleep(0.5)
                         client_login_socket.send(token)
 
                         client_login_socket.close()

@@ -228,17 +228,21 @@ class ClientConn(object):
         # signal.signal(signal.SIGINT, self.sig_exit)
         self.socketlist.append(self.client_socket)
 
-        self.client_listen_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.client_listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-
-        self.client_listen_socket.bind((self.local_ip, self.listen_port))
-        self.socketlist.append(self.client_listen_socket)
-
         # 用来发送的socket绑定
         # ====================
         ClientConn.send_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
         ClientConn.send_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         ClientConn.send_socket.bind((self.local_ip, self.listen_port))  # 发送端口与接受消息端口相同
+
+        self.client_listen_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.client_listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.client_listen_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+        self.client_listen_socket.bind((self.local_ip, self.listen_port))
+
+        self.socketlist.append(self.client_listen_socket)
+
+
+
 
         ClientConn.send_socket_default.bind((self.local_ip, 6888))
 
@@ -276,6 +280,7 @@ class ClientConn(object):
             read_sockets, write_sockets, error_sockets = select.select(self.socketlist, [], [])
             res = ""
             for sock in read_sockets:
+                print "....."
                 if sock == self.client_socket:
                     print "client_reveived"
                     try:
@@ -288,11 +293,12 @@ class ClientConn(object):
                             res = (0, data)
                     except socket.error:
                         res = (-3, "Disconnect with server!!!")
+                    print "11111"
 
                 elif sock == self.client_listen_socket:
                     print "ooooooo"
                     data, peer_addr = sock.recvfrom(self.BUF)
-
+                    print data
                     if not data:
                         sock.close()
                         continue
@@ -301,6 +307,7 @@ class ClientConn(object):
                     if data.startswith("$"):
                         print "$$$$$$$$"
                         hole_aim_addr = data[1:]
+                        hole_aim_addr = tuple(eval(hole_aim_addr))
                         ClientConn.send_socket.sendto("hello", hole_aim_addr)
                         continue
                     data = json.loads(data)   # 解析含有id的data

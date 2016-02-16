@@ -156,6 +156,7 @@ class Server(object):
                         token = sha.hexdigest() + "|" + str(user_id)
                         self.tokendict[user_id] = token
 
+                        print user_id
                         client_login_socket.send(token)
                         client_login_socket.close()
                     else:
